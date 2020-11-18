@@ -2,6 +2,9 @@ import leilao.dominio.Lance;
 import leilao.dominio.Leilao;
 import leilao.dominio.Usuario;
 import leilao.servico.Avaliador;
+import leilao.servico.CriadorDeLeilao;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -10,22 +13,29 @@ import static junit.framework.TestCase.assertEquals;
 
 public class TesteDoAvaliador {
 
+    private Avaliador leiloeiro;
+
+    @Before
+    public void criarInstanciaDoAvaliador(){
+        leiloeiro = new Avaliador();
+    }
+
     @Test
     public void deveEntenderLancesEmOrdemCrescente() {
         //parte 1 : cenario
         Usuario joao = new Usuario("João");
         Usuario jose = new Usuario("Jose");
-        Usuario Maria = new Usuario("Maria");
+        Usuario maria = new Usuario("Maria");
 
-        Leilao leilao = new Leilao("Playstation 3 Novo");
-
-        leilao.propoe( new Lance(joao,250.0));
-        leilao.propoe( new Lance(jose,300.0));
-        leilao.propoe( new Lance(Maria,400.0));
+        Leilao leiao2 = new CriadorDeLeilao().para("Playstation 3 Novo")
+                .lance(joao,250.0)
+                .lance(maria,300.0)
+                .lance(joao,350.0)
+                .lance(maria,400.0)
+                .constroi();
 
         // parte 2: acao
-        Avaliador leiloeiro = new Avaliador();
-        leiloeiro.avalia(leilao);
+        leiloeiro.avalia(leiao2);
 
         //parte 3: validacao
 
@@ -44,20 +54,20 @@ public class TesteDoAvaliador {
        Usuario maria = new Usuario("Maria");
        Usuario matheus = new Usuario("Matheus");
 
-       Leilao leilao = new Leilao("XBox 360");
+       Leilao leiao2 = new CriadorDeLeilao().para("Moto")
+               .lance(joao,250.0)
+               .lance(maria,100.0)
+               .lance(matheus,50.0)
+               .constroi();
 
        //parte 2: acao
-       leilao.propoe(new Lance(joao,250));
-       leilao.propoe(new Lance(maria,100));
-       leilao.propoe(new Lance(matheus,50));
 
        //parte 3: validacao
 
-       Avaliador avaliador = new Avaliador();
 
-       avaliador.avalia(leilao);
+       leiloeiro.avalia(leiao2);
 
-       assertEquals(133.33333333333334,avaliador.getMedia(),0.0004);
+       assertEquals(133.33333333333334,leiloeiro.getMedia(),0.0004);
 
    }
 
@@ -70,11 +80,10 @@ public class TesteDoAvaliador {
 
        Leilao leilao = new Leilao("XBox 360");
 
-       Avaliador avaliador = new Avaliador();
         //parte 2: acao
-       avaliador.avalia(leilao);
+       leiloeiro.avalia(leilao);
         //parte 3: validacao
-       assertEquals(0,avaliador.getMedia(),0.0001);
+       assertEquals(0,leiloeiro.getMedia(),0.0001);
 
    }
 
@@ -87,12 +96,10 @@ public class TesteDoAvaliador {
         //parte 2: acao
        leilao.propoe( new Lance(matheus,400.0));
 
-       Avaliador avaliador = new Avaliador();
-
-       avaliador.avalia(leilao);
+       leiloeiro.avalia(leilao);
         //parte 3: validação
-       assertEquals(400.0,avaliador.getMaiorLance(),0.0001);
-       assertEquals(400.0,avaliador.getMenorLance(),0.0001);
+       assertEquals(400.0,leiloeiro.getMaiorLance(),0.0001);
+       assertEquals(400.0,leiloeiro.getMenorLance(),0.0001);
    }
 
     @Test
@@ -101,17 +108,16 @@ public class TesteDoAvaliador {
         Usuario matheus = new Usuario("Matheus");
         Usuario maria = new Usuario("Maria");
 
-        Leilao leilao = new Leilao("Xbox 360");
+        Leilao leilao = new CriadorDeLeilao().para("Xbox 360")
+                .lance(matheus,400.0)
+                .lance(maria,550.0)
+                .lance(matheus,700.0)
+                .constroi();
+
         //parte 2: acao
-        leilao.propoe( new Lance(matheus,400.0));
-        leilao.propoe( new Lance(maria,550.0));
-        leilao.propoe( new Lance(matheus,700.0));
+        leiloeiro.avalia(leilao);
 
-        Avaliador avaliador = new Avaliador();
-
-        avaliador.avalia(leilao);
-
-        List<Lance> maiores = avaliador.getTresMaioresLances();
+        List<Lance> maiores = leiloeiro.getTresMaioresLances();
 
         //parte 3: validação
         assertEquals(3,maiores.size());
@@ -126,23 +132,23 @@ public class TesteDoAvaliador {
         //parte 1: cenario
         Usuario matheus = new Usuario("Matheus");
         Usuario maria = new Usuario("Maria");
+        
+        Leilao leilao = new CriadorDeLeilao().para("Fogão a gas")
+                .lance(matheus,200.0)
+                .lance(maria,450.0)
+                .lance(matheus,120.0)
+                .lance(maria,700.0)
+                .lance(matheus,630.0)
+                .lance(maria,230.0)
 
-        Leilao leilao = new Leilao("Fogão a gas");
-
-        leilao.propoe(new Lance(matheus,200.0));
-        leilao.propoe(new Lance(maria,450.0));
-        leilao.propoe(new Lance(matheus,120.0));
-        leilao.propoe(new Lance(maria,700.0));
-        leilao.propoe(new Lance(matheus,630.0));
-        leilao.propoe(new Lance(maria,230.0));
+                .constroi();
 
         //parte 2: Ação
-        Avaliador avaliador = new Avaliador();
-        avaliador.avalia(leilao);
+        leiloeiro.avalia(leilao);
 
         //parte 3: Validação
-        assertEquals(700.0,avaliador.getMaiorLance(),0.0001);
-        assertEquals(120.0,avaliador.getMenorLance(),0.0001);
+        assertEquals(700.0,leiloeiro.getMaiorLance(),0.0001);
+        assertEquals(120.0,leiloeiro.getMenorLance(),0.0001);
 
     }
     @Test
@@ -159,13 +165,13 @@ public class TesteDoAvaliador {
         leilao.propoe(new Lance(maria,100.0));
 
         //parte 2: Ação
-        Avaliador avaliador = new Avaliador();
-        avaliador.avalia(leilao);
+
+        leiloeiro.avalia(leilao);
 
         //parte 3: validação
 
-        assertEquals(400.0,avaliador.getMaiorLance(),0.0001);
-        assertEquals(100.0,avaliador.getMenorLance(),0.0001);
+        assertEquals(400.0,leiloeiro.getMaiorLance(),0.0001);
+        assertEquals(100.0,leiloeiro.getMenorLance(),0.0001);
 
     }
     @Test
@@ -180,11 +186,9 @@ public class TesteDoAvaliador {
         leilao.propoe( new Lance(maria,550.0));
 
 
-        Avaliador avaliador = new Avaliador();
+        leiloeiro.avalia(leilao);
 
-        avaliador.avalia(leilao);
-
-        List<Lance> maiores = avaliador.getTresMaioresLances();
+        List<Lance> maiores = leiloeiro.getTresMaioresLances();
 
         //parte 3: validação
         assertEquals(2,maiores.size());
@@ -200,19 +204,13 @@ public class TesteDoAvaliador {
 
         Leilao leilao = new Leilao("Xbox 360");
         //parte 2: acao
+        leiloeiro.avalia(leilao);
 
-
-
-        Avaliador avaliador = new Avaliador();
-
-        avaliador.avalia(leilao);
-
-        List<Lance> maiores = avaliador.getTresMaioresLances();
+        List<Lance> maiores = leiloeiro.getTresMaioresLances();
 
         //parte 3: validação
         assertEquals(0,maiores.size());
 
     }
-
 
 }
