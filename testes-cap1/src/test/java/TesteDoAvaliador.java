@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TesteDoAvaliador {
 
@@ -71,7 +72,7 @@ public class TesteDoAvaliador {
 
    }
 
-   @Test
+   @Test(expected = RuntimeException.class)
     public void deveSerZeroAhMediaCasoNaoTenhaLances(){
        //parte 1: cenario
        Usuario joao = new Usuario("João");
@@ -196,7 +197,7 @@ public class TesteDoAvaliador {
         assertEquals(400.0,maiores.get(1).getValor(),0.0001);
 
     }
-    @Test
+    @Test(expected = RuntimeException.class)
     public void deveRetornarUmaListaVaziaCasoNaoHouverNengumLance(){
         //parte 1: cenario
         Usuario matheus = new Usuario("Matheus");
@@ -211,6 +212,13 @@ public class TesteDoAvaliador {
         //parte 3: validação
         assertEquals(0,maiores.size());
 
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void naoDeveAvaliarLeilaoSemLancesCadastrados(){
+        Leilao leilao = new CriadorDeLeilao().para("Playstation 3 Novo").constroi();
+
+        leiloeiro.avalia(leilao);
     }
 
 }
